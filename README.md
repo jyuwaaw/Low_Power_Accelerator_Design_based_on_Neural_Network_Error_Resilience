@@ -39,7 +39,7 @@ However, achieving large power reductions *while* keeping high inference accurac
 
 ### 3.2 Data Reordering Algorithm
 
-![A very nice cat](images/cat.png "Cat Title")
+![Reordering Algorithm](https://github.com/jyuwaaw/Neural_Network_Error_Resilience_Low_Power_Accelerator_Design/blob/main/pics/Chapter3/pseudo_3.2.png "Reordering Algorithm")
 
 
 1. **Goal**: Minimize adjacent bit flips in an input (or weight) sequence without altering the final accumulation result.
