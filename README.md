@@ -39,6 +39,9 @@ However, achieving large power reductions *while* keeping high inference accurac
 
 ### 3.2 Data Reordering Algorithm
 
+![A very nice cat](images/cat.png "Cat Title")
+
+
 1. **Goal**: Minimize adjacent bit flips in an input (or weight) sequence without altering the final accumulation result.
 2. **Implementation**  
    - Compute pairwise bit-flip costs via XOR.
