@@ -35,24 +35,42 @@ However, achieving large power reductions *while* keeping high inference accurac
 2. **Observations**  
    - Most input pairs do *not* trigger the worst-case delay path.
    - High-bit flips near carry chains produce longer delays.
+
+
+
+<div style="display: flex; gap: 20px; justify-content: center;">
+  <img src="https://github.com/jyuwaaw/Neural_Network_Error_Resilience_Low_Power_Accelerator_Design/blob/main/pics/Chapter2/bit_flip_pos.png" alt="Pic 1" style="width: 30%;">
+  <img src="https://github.com/jyuwaaw/Neural_Network_Error_Resilience_Low_Power_Accelerator_Design/blob/main/pics/Chapter2/Snipaste_2023-06-03_18-54-26.jpg" alt="Pic 2" style="width: 30%;">
+  <img src="https://github.com/jyuwaaw/Neural_Network_Error_Resilience_Low_Power_Accelerator_Design/blob/main/pics/Chapter2/bitjumpsquant.jpg" alt="Pic 3" style="width: 30%;">
+</div>
+
    - Delay distribution is skewed toward lower values, suggesting potential for voltage scaling or clock period reduction.
 
 ### 3.2 Data Reordering Algorithm
 
-<figure style="text-align:center;">
-  <img src="https://github.com/jyuwaaw/Neural_Network_Error_Resilience_Low_Power_Accelerator_Design/blob/main/pics/Chapter3/pseudo_3.2.png" alt="Reordering Algorithm" width="400">
-  <figcaption>Reordering Algorithm Pseudocode.</figcaption>
-</figure>
 
 
 1. **Goal**: Minimize adjacent bit flips in an input (or weight) sequence without altering the final accumulation result.
 2. **Implementation**  
    - Compute pairwise bit-flip costs via XOR.
    - Use a greedy or heuristic method to reorder the sequence so that *neighboring data* have fewer and/or lower-position bit flips.
+
+<figure style="text-align:center;">
+  <p align="center">
+  <img src="https://github.com/jyuwaaw/Neural_Network_Error_Resilience_Low_Power_Accelerator_Design/blob/main/pics/Chapter3/pseudo_3.2.png" alt="Reordering Algorithm" width="400">
+    </p>
+</figure>
+
 3. **Experiments**  
    - Selected **AlexNet’s third convolution layer** weights as test data.
    - Fixed certain input activations (e.g., 127, 255) to simulate MAC operations in a single PE or small PE array.
    - Results show **significant** reduction in high-delay occurrences after data reordering.
+  
+<figure style="text-align:center;">
+  <p align="center">
+  <img src="https://github.com/jyuwaaw/Neural_Network_Error_Resilience_Low_Power_Accelerator_Design/blob/main/pics/Chapter3/reordered_data.png"  width="500">
+    </p>
+</figure>
 
 ### 3.3 Accelerator Mapping & Dataflow
 
@@ -74,6 +92,18 @@ However, achieving large power reductions *while* keeping high inference accurac
 - **Implementation Feasibility**  
   - No extra hardware is strictly required if integrated in an architecture like SCNN (where indexes/coordinates are already tracked).
   - For other designs, minimal overhead is needed for coordinate mapping.
+
+<figure style="text-align:center;">
+  <p align="center">
+  <img src="https://github.com/jyuwaaw/Neural_Network_Error_Resilience_Low_Power_Accelerator_Design/blob/main/pics/Chapter4/arch_1.png" width="600">
+    </p>
+</figure>
+
+<figure style="text-align:center;">
+  <p align="center">
+  <img src="https://github.com/jyuwaaw/Neural_Network_Error_Resilience_Low_Power_Accelerator_Design/blob/main/pics/Chapter4/arch_2.png"  width="600">
+    </p>
+</figure>
 
 ## 5. Conclusion & Future Work
 
