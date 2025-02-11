@@ -1,0 +1,36 @@
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+\begin{algorithm}[H]
+\caption{Calculate bit jumps between binary numbers}
+\begin{algorithmic}[1]
+\Function{calculate\_bit\_jumps}{$binary\_nums$}
+    \State $jumps \gets \emptyset$
+    \For{$i \gets 0$ \textbf{to} $\text{len}(binary\_nums) - 1$}
+        \For{$j \gets i + 1$ \textbf{to} $\text{len}(binary\_nums)$}
+            \State $jump\_count \gets \sum_{k=1}^{\text{len}(binary\_nums[i])} [binary\_nums[i][k] \neq binary\_nums[j][k]]$
+            \State $jumps \gets jumps \cup \{(i, j, jump\_count)\} \cup \{(j, i, jump\_count)\}$
+        \EndFor
+    \EndFor
+    \State \textbf{return} $\text{list}(jumps)$
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\caption{Calculate optimal order for binary numbers}
+\begin{algorithmic}[1]
+\Function{get\_optimal\_order}{$binary\_nums$}
+    \State $jumps \gets \text{calculate\_bit\_jumps}(binary\_nums)$
+    \State $order \gets [0]$
+    \State $remaining\_nums \gets \{\text{range}(1, \text{len}(binary\_nums))\}$
+    \While{$remaining\_nums \neq \emptyset$}
+        \State $bit\_jumps \gets [(j, k, jump) \text{ for } j, k, jump \text{ in } jumps \text{ if } j = order[-1] \text{ and } k \text{ in } remaining\_nums]$
+        \State $next\_num \gets \min(bit\_jumps, key=lambda x: x[2])[1]$
+        \State $order \gets order \cup [next\_num]$
+        \State $remaining\_nums \gets remaining\_nums \setminus \{next\_num\}$
+    \EndWhile
+    \State \textbf{return} $order$
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
