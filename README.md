@@ -51,7 +51,9 @@ However, achieving large power reductions *while* keeping high inference accurac
 3. **Fundamental Low Power Technique**
    - Power gating for unused PEs
       - For a large PE array, 64×64 for example, the systolic array will benefit from switching off partial of it's array to achieve an even lower power consumption.
-   - TODO: Synopsys 
+   - Reduced memory access
+      - Input Stationary (IS) dataflow was implemented, in this case, the occurances of fetching input feature map from memory significantly reduced. Previously, the **N** feature map will compute with **M** weight matrices, total **N × M** times of memory fetch. By implementing IS dataflow, we reduced the total number of memory fetching from **N × M** to **M** only.
+   - *************TODO: Synopsys NLP******************
 <figure style="text-align:center;">
   <p align="center">
   <img src="https://github.com/jyuwaaw/Neural_Network_Error_Resilience_Low_Power_Accelerator_Design/blob/main/pics/PE_off.jpg" alt="PE array Power Gating" width="400">
@@ -120,18 +122,15 @@ However, achieving large power reductions *while* keeping high inference accurac
 ## 5. Conclusion & Future Work
 
 - **Major Contributions**  
-  1. Demonstrates **data-sequence reordering** as a low-power technique, exploiting bit-flip patterns and timing slack.  
-  2. Uses real gate-level data to validate how reordering reduces average delay in an 8-bit MAC design.  
-  3. Proposes a mapping strategy in existing accelerator architectures (e.g., SCNN) without additional hardware cost.
-
-- **Limitations**  
-  - Only examined **input-stationary** dataflow in detail; other dataflows (weight-stationary, output-stationary) remain untested.  
-  - Explored single or small PE arrays; large-scale deployment may involve more complex scheduling, memory considerations, or multi-layer reordering.
+  1. Demonstrates **data-sequence reordering** as a low-power technique, exploiting bit-flip patterns and timing slack. 
+  2. Introduces fine-tuned dynamic voltage and frequency scaling by observing trade-offs between an acceptable model accuracy and 
+  3. Uses real gate-level data to validate how reordering reduces average delay in an 8-bit MAC design.  
+  4. Proposes a mapping strategy in existing accelerator architectures (e.g., SCNN) without additional hardware cost.
 
 - **Future Directions**  
   1. Investigate reordering in combination with advanced pruning or quantization techniques.  
   2. Evaluate performance on more varied network layers (deeper or more complex topologies).  
-  3. Prototype on FPGA/ASIC to quantify real-world power and accuracy trade-offs.
+  3. Prototype a module on `Flexibit` to quantify real-world power and accuracy trade-offs.
 
 ## References
 
