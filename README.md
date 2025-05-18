@@ -54,7 +54,7 @@ However, achieving large power reductions *while* keeping high inference accurac
    - TODO: Synopsys 
 <figure style="text-align:center;">
   <p align="center">
-  <img src="https://github.com/jyuwaaw/Neural_Network_Error_Resilience_Low_Power_Accelerator_Design/blob/main/pics/Chapter3/PE_off.jpg" alt="Reordering Algorithm" width="400">
+  <img src="https://github.com/jyuwaaw/Neural_Network_Error_Resilience_Low_Power_Accelerator_Design/blob/main/pics/PE_off.jpg" alt="PE array Power Gating" width="400">
     </p>
 </figure>
 
