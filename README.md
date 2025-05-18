@@ -38,6 +38,8 @@ However, achieving large power reductions *while* keeping high inference accurac
 
 
 
+
+
 <div style="display: flex; gap: 20px; justify-content: center;">
   <img src="https://github.com/jyuwaaw/Neural_Network_Error_Resilience_Low_Power_Accelerator_Design/blob/main/pics/Chapter2/bit_flip_pos.png" alt="Pic 1" style="width: 30%;">
   <img src="https://github.com/jyuwaaw/Neural_Network_Error_Resilience_Low_Power_Accelerator_Design/blob/main/pics/Chapter2/Snipaste_2023-06-03_18-54-26.jpg" alt="Pic 2" style="width: 30%;">
@@ -45,6 +47,16 @@ However, achieving large power reductions *while* keeping high inference accurac
 </div>
 
    - Delay distribution is skewed toward lower values, suggesting potential for voltage scaling or clock period reduction.
+
+3. **Fundamental Low Power Technique**
+   - Power gating for unused PEs
+      - For a large PE array, 64×64 for example, the systolic array will benefit from switching off partial of it's array to achieve an even lower power consumption.
+   - TODO: Synopsys 
+<figure style="text-align:center;">
+  <p align="center">
+  <img src="https://github.com/jyuwaaw/Neural_Network_Error_Resilience_Low_Power_Accelerator_Design/blob/main/pics/Chapter3/PE_off.jpg" alt="Reordering Algorithm" width="400">
+    </p>
+</figure>
 
 ### 3.2 Data Reordering Algorithm
 
