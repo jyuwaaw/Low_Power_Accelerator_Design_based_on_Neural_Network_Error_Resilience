@@ -53,7 +53,7 @@ However, achieving large power reductions *while* keeping high inference accurac
       - For a large PE array, 64×64 for example, the systolic array will benefit from switching off partial of it's array to achieve an even lower power consumption.
    - Reduced memory access
       - Input Stationary (IS) dataflow was implemented, in this case, the occurances of fetching input feature map from memory significantly reduced. Previously, the **N** feature map will compute with **M** weight matrices, total **N × M** times of memory fetch. By implementing IS dataflow, we reduced the total number of memory fetching from **N × M** to **M** only.
-   - UPF for the PE
+   - UPF for the PE(Later in VCS NLP)
       ``` C++
       ## CREATE POWER DOMAINS
       ######################
