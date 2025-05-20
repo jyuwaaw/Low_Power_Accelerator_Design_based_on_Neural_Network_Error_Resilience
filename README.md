@@ -21,7 +21,7 @@ However, achieving large power reductions *while* keeping high inference accurac
 
 - **Timing Slack**: Static timing analysis must guarantee correctness for the worst-case path (i.e., maximum delay). But many real input patterns do not trigger that path.
 - **Bit Flips & Delay**: In an 8-bit multiplier, large or high-bit flips often cause longer computation delays. If the input data sequence is re-ordered to minimize drastic bit-position changes, the *actual* delays become lower or shorter more often.
-- **Reduced Operating Voltage**: Once most operations avoid the high-delay scenario, we can safely lower the supply voltage or clock period. Due to the DNN’s inherent fault tolerance, occasional timing violations won’t drastically degrade accuracy.
+- **Dynamic Voltage/Frequency Scaling(DVFS)**: Once most operations avoid the high-delay scenario, we can safely lower the supply voltage or clock period. Due to the DNN’s inherent fault tolerance, occasional timing violations won’t drastically degrade accuracy.
 
 ## 3. Methodology
 
@@ -53,7 +53,68 @@ However, achieving large power reductions *while* keeping high inference accurac
       - For a large PE array, 64×64 for example, the systolic array will benefit from switching off partial of it's array to achieve an even lower power consumption.
    - Reduced memory access
       - Input Stationary (IS) dataflow was implemented, in this case, the occurances of fetching input feature map from memory significantly reduced. Previously, the **N** feature map will compute with **M** weight matrices, total **N × M** times of memory fetch. By implementing IS dataflow, we reduced the total number of memory fetching from **N × M** to **M** only.
-   - *************TODO: Synopsys NLP******************
+   - UPF for the PE
+      ``` C++
+      ## CREATE POWER DOMAINS
+      ######################
+      create_power_domain TOP
+      create_power_domain MULT  -elements Multiplier
+
+      ## TOPLEVEL CONNECTIONS
+      #######################
+      # VDD
+      create_supply_port VDD 
+      create_supply_net  VDD   -domain TOP
+      connect_supply_net VDD   -ports VDD
+
+      # VSS
+      create_supply_port VSS 
+      create_supply_net  VSS   -domain TOP
+      create_supply_net  VSS   -domain MULT -reuse
+
+      connect_supply_net VSS   -ports VSS
+
+      ## PRIMARY POWER NETS
+      #####################
+      set_domain_supply_net TOP   -primary_power_net VDD   -primary_ground_net VSS
+      set_domain_supply_net MULT  -primary_power_net VDDMS -primary_ground_net VSS
+
+
+      ## MULT SETUP
+      #############
+      # SWITCH
+      create_power_switch mult_sw \
+        -domain MULT \
+        -input_supply_port {in VDDM} \
+        -output_supply_port {out VDDMS} \
+        -control_port {mult_on mult_on} \
+        -on_state {mac_u in {!mult_on}}
+
+      # ISO
+      set_isolation mult_iso_out \
+        -domain MULT \
+        -isolation_power_net VDD -isolation_ground_net VSS \
+        -clamp_value 1 \
+        -applies_to outputs 
+
+      set_isolation_control mult_iso_out \
+        -domain MULT \
+        -isolation_signal mult_iso_out \
+        -isolation_sense high \
+        -location parent
+
+      # ADD PORT STATE INFO
+      #####################
+      add_port_state VDD   -state {HV  1.2}
+
+      add_port_state VDDM  -state {HV  1.2}
+
+      add_port_state mult_sw/out -state {HV  1.2}\
+                                -state {OFF off}
+                                
+      ## CREATE PST#############
+      create_pst chiptop_pst -supplies{}
+      ```
 <figure style="text-align:center;">
   <p align="center">
   <img src="https://github.com/jyuwaaw/Neural_Network_Error_Resilience_Low_Power_Accelerator_Design/blob/main/pics/PE_off.jpg" alt="PE array Power Gating" width="400">
@@ -76,6 +137,7 @@ However, achieving large power reductions *while* keeping high inference accurac
 </figure>
 
 3. **Experiments**  
+   - Used Synopsys `DW02` 8-bit multiplier as the processing element (PE). Synthesized and placed/routed in a 90nm process. Extracted delay data through exhaustive input tests (all 8-bit pairs).
    - Selected **AlexNet’s third convolution layer** weights as test data.
    - Fixed certain input activations (e.g., 127, 255) to simulate MAC operations in a single PE or small PE array.
    - Results show **significant** reduction in high-delay occurrences after data reordering.
@@ -101,9 +163,18 @@ However, achieving large power reductions *while* keeping high inference accurac
 - **Delay Distribution Improvement**  
   - Before reordering: high-delay cases occur more frequently due to large bit flips.
   - After reordering: these cases drop significantly, pushing most delay paths below a lower threshold.
-- **Voltage/Frequency Scaling Potential**  
-  - With fewer worst-case delays, one can scale down the voltage (or tighten the clock) to reduce power. DNN fault tolerance ensures minimal impact on final accuracy.
-- **Implementation Feasibility**  
+- **Dynamic Voltage/Frequency Scaling**  
+  - Originally we have the PE running at 1 GHz, by obesrving the delay distribution, we can tell that most of the delay lies near 5000ps. To implement Dynamic Voltage/Frequency Scaling(**DVFS**) we set the bottomline of model accuracy to 85%. A sweep script exercises the PE at frequencies from 1 GHz downwards, measuring the induced error rate and resulting model accuracy. And ultimately we find that by dropping the clock frequency to 297.2MHz, we can still meet the bottomline with 85.72% accuracy. 
+  
+  - As we stretch the clock period beyond the bulk of the delay distribution, occasional paths will exceed the period and produce timing errors.Because the network’s weights and activations inherently smooth out small numbers of errors, accuracy degrades gradually rather than collapsing.
+
+    | Clock Frequency | Model Accuracy |
+    | :-------------: | :------------: |
+    |      1 GHz      |     99.8 %     |
+    |    297.2 MHz    |     85.72 %    |
+
+  Key takeaway: By leveraging the neural network’s graceful degradation under sparse timing errors, DVFS can push the PE well below its worst-case frequency, slashing power consumption while respecting a user-defined accuracy floor.
+- **Dataflow Implementation Feasibility**  
   - No extra hardware is strictly required if integrated in an architecture like SCNN (where indexes/coordinates are already tracked).
   - For other designs, minimal overhead is needed for coordinate mapping.
 
